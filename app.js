@@ -15,6 +15,7 @@ var clientSecret = process.argv[3] || 'f073715ed9def9186b1463befcace1fe';
 
 var hostBaseUrl = process.argv[4] || 'http://localhost:' + port;
 var apiBaseUrl = process.argv[5] || 'https://api.singly.com';
+var crimeSpottingUrl = 'http://sanfrancisco.crimespotting.org/crime-data';
 
 // Pick a secret to secure your session storage
 var sessionSecret = '42';
@@ -154,12 +155,24 @@ app.get('/callback', function(req, res) {
 });
 
 //function to get all checkins
-app.get('/checkins', function(req, res) {
-  console.log(req.session);
+app.get('/crimescore.json', function(req, res) {
 	getProtectedResource('/types/checkins', req.session, function(err, checkinsBody) {
-		console.log(checkinsBody);
+		try {
+      checkinsBody = JSON.parse(checkinsBody);
+			console.log(checkinsBody);
+    }
+    catch(parseErr) {
+      console.log('error');
+			return res.send(parseErr, 500);
+    }
+		var checkins = [];
+		checkinsBody.forEach(function(datum) {
+			checkins.push(datum.oembed);
+		});
 	});
 });
+
+
 
 app.listen(port);
 

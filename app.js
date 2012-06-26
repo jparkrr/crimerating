@@ -22,6 +22,22 @@ var crimeSpottingUrl = 'http://sanfrancisco.crimespotting.org/crime-data';
 
 var ebkey = 'aQkRJjUKPcdtRfA';
 
+var crimeWeights = { 
+ "murder" : 13,
+ "arson": 12,
+ "aggravated_assault": 11,
+ "vehicle_theft": 10,
+ "robbery": 9,
+ "burglary": 8,
+ "simple_assault": 7,
+ "theft": 6,
+ "vandalism": 5,
+ "prostitution": 4,
+ "alcohol": 3,
+ "narcotics": 2,
+ "disturbing_the_peace": 1,
+};
+
 
 // Pick a secret to secure your session storage
 var sessionSecret = '42';
@@ -178,21 +194,19 @@ app.get('/crimescore.json', function(req, res) {
 });
 
 function getCrimeScore(checkins){
-	var numCrimes;
+	var crimeScore
 	checkins.forEach(function(checkin){
-		numCrimes = numCrimes + crimesPerCheckin(checkin);
+		crimeScore = crimeScore + crimesPointsPerCheckin(checkin);
 	});
+	return crimeScore/checkins.length;
 }
 
-function crimesPerCheckin(checkin){
-	var now = new Date(year, month, day);
-	var box = boxFromCheckin(checkin);
-	var uri = 'http://sanfrancisco.crimespotting.org/crime-data?format=json&count=' + bigNumber + '&box=' +box+ '&start=' + start;
-	var nCrimes;	
-	request.get({uri:uri, json:true}, function (err, resp, js){
-		nCrimes = js.features.length;	
-	})
+function crimesPointsPerCheckin(checkin){
+	database.run("SELECT SUM(crime) as \"crimePoints\" FROM Coords WHERE lat < " + north + "AND lat > " + south +
+		"AND long < " +east+ "AND long > " +west;
 }
+
+
 
 app.listen(port);
 

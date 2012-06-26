@@ -217,13 +217,12 @@ function getCrimeScore(checkins){
 	return crimeScore/checkins.length;
 }
 
-/*
 function crimesPointsPerCheckin(checkin){
+		
 	var box = getBB(checkin);
 	database.run("SELECT SUM(crime) as \"crimePoints\" FROM Coords WHERE lat < " + north + "AND lat > " + south +
 		"AND long < " +east+ "AND long > " +west;
 }
-*/
 
 
 function populateDatabase() {
@@ -231,20 +230,16 @@ function populateDatabase() {
     db.run("CREATE TABLE crimes (lat REAL, lng REAL, weight INTEGER)");
   });
   var currentDate = new Date();
-
   var start = new Date();
   start.setMonth(currentDate.getMonth() - 4);
-
   var end = new Date();
   end.setMonth(currentDate.getMonth() - 1);
   var uri = 'http://sanfrancisco.crimespotting.org/crime-data?format=json&count=' + bigNumber + '&dstart=' + start.toISOString().substr(0,10) + '&dend=' + end.toISOString().substr(0,10);
-	console.log(uri);
     request.get(uri, function (err, resp, js){
 		console.log(js);
 		js.features.forEach( function (feature) {
 			db.r
 		});
-      //db.run("");
     });
 }
 

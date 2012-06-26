@@ -1,5 +1,6 @@
 // The URL of the Singly API endpoint
 var apiBaseUrl = 'https://api.singly.com';
+var crimeScoreUrl = 'http://localhost:8043/crimescore.json';
 
 // A small wrapper for getting data from the Singly API
 var singly = {
@@ -34,9 +35,24 @@ $(function() {
    });
 
    // Get the 5 latest items from the user's Twitter feed
-   singly.get('/services/twitter/timeline', { limit: 5 }, function(tweets) {
+   /*singly.get('/services/twitter/timeline', { limit: 5 }, function(tweets) {
       _.each(tweets, function(tweet) {
          $('#twitter').append(sprintf('<li><strong>Tweet:</strong> %s</li>', tweet.data.text));
       });
-   });
+   });*/
+   function getCrimeScore() {
+      console.log('getting crimescore');
+      $.getJSON(crimeScoreUrl, function(js) {
+         updateCrimeScore(js.crimeScore);
+      })
+      .error(function () {
+         updateCrimeScore("(server error)");
+      });
+   }
+
+   function updateCrimeScore(num) {
+      $('#cs').html(num);
+   }
+
+   getCrimeScore();
 });

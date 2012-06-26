@@ -74,6 +74,9 @@ app.configure(function() {
     secret: sessionSecret
   }));
   app.use(app.router);
+  app.set('view options', {
+  layout: true
+});
 });
 
 // We want exceptions and stracktraces in development

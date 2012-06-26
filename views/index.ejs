@@ -1,4 +1,26 @@
-<p>Register with one or more of these services:</p>
+<!DOCTYPE html>
+<html>
+ <head>
+  <title>CrimeScore</title>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+
+  <script src="/lib/sprintf-0.7-beta1.js"></script>
+  <script src="/lib/underscore-min.js"></script>
+
+  <script>
+   var accessToken = '<%= session.access_token %>';
+  </script>
+
+  <script src="/app.js"></script>
+
+  <link rel="stylesheet" href="/styles.css" />
+ </head>
+
+ <body>
+  <h1><a href="/">CrimeScore</a></h1>
+
+  <p>Register with one or more of these services:</p>
 
 <ul id="auth">
 <% for (var i = 0; i < services.length; i++) { %>
@@ -10,10 +32,14 @@
  <a href="http://singly.com/"><img src="/empowered.png" /></a>
 </div>
 
-<div id="access-token-wrapper">
- <p>Here's your access token for making API calls directly: <input type="text" id="access-token"></input></p>
-</div>
-
 <ul id="profiles"></ul>
 
-<ul id="twitter"></ul>
+<div>
+ <h1>
+    Your CrimeScore is: <span id="cs">loading...</span>
+ </h1>
+</div>
+ </body>
+</html>
+
+

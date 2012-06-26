@@ -8,7 +8,7 @@ var OAuth2 = require('oauth').OAuth2;
 var sqlite3 = require('sqlite3').verbose();
 
 //large number to avoid limit on crimes
-var bigNumber = 100000;
+var bigNumber = 1000;
 
 // The port that this express app will listen on
 var port = 8043;
@@ -24,19 +24,19 @@ var crimeSpottingUrl = 'http://sanfrancisco.crimespotting.org/crime-data';
 var ebkey = 'aQkRJjUKPcdtRfA';
 
 var crimeWeights = { 
- "murder" : 13,
- "arson": 12,
- "aggravated_assault": 11,
- "vehicle_theft": 10,
- "robbery": 9,
- "burglary": 8,
- "simple_assault": 7,
- "theft": 6,
- "vandalism": 5,
- "prostitution": 4,
- "alcohol": 3,
- "narcotics": 2,
- "disturbing_the_peace": 1,
+ "MURDER" : 13,
+ "ARSON": 12,
+ "AGGRAVATED_ASSAULT": 11,
+ "VEHICLE_THEFT": 10,
+ "ROBBERY": 9,
+ "BURLGARY": 8,
+ "SIMPLE_ASSAULT": 7,
+ "THEFT": 6,
+ "VANDALISM": 5,
+ "PROSTITUTION": 4,
+ "ALCOHOL": 3,
+ "NARCOTICS": 2,
+ "DISTURBING_THE_PEACE": 1
 };
 
 var db = new sqlite3.Database(":memory:");
@@ -217,14 +217,16 @@ function getCrimeScore(checkins){
 	return crimeScore/checkins.length;
 }
 
+/*
 function crimesPointsPerCheckin(checkin){
 	var box = getBB(checkin);
 	database.run("SELECT SUM(crime) as \"crimePoints\" FROM Coords WHERE lat < " + north + "AND lat > " + south +
 		"AND long < " +east+ "AND long > " +west;
 }
+*/
 
 
-function populateDatabase(db) {
+function populateDatabase() {
   db.serialize(function() {
     db.run("CREATE TABLE crimes (lat REAL, lng REAL, weight INTEGER)");
   });
@@ -235,9 +237,13 @@ function populateDatabase(db) {
 
   var end = new Date();
   end.setMonth(currentDate.getMonth() - 1);
-  var uri = 'http://sanfrancisco.crimespotting.org/crime-data?format=json&count=' + bigNumber + '&dstart=' + start + '&dend=' + end;
-    request.get({uri:uri, json:true}, function (err, resp, js){
-      console.log(js);
+  var uri = 'http://sanfrancisco.crimespotting.org/crime-data?format=json&count=' + bigNumber + '&dstart=' + start.toISOString().substr(0,10) + '&dend=' + end.toISOString().substr(0,10);
+	console.log(uri);
+    request.get(uri, function (err, resp, js){
+		console.log(js);
+		js.features.forEach( function (feature) {
+			db.r
+		});
       //db.run("");
     });
 }

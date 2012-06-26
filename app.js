@@ -6,6 +6,9 @@ var request = require('request');
 var sprintf = require('sprintf').sprintf;
 var OAuth2 = require('oauth').OAuth2;
 
+//large number to avoid limit on crimes
+var bigNumber = 100000;
+
 // The port that this express app will listen on
 var port = 8043;
 
@@ -182,6 +185,13 @@ function getCrimeScore(checkins){
 }
 
 function crimesPerCheckin(checkin){
+	var now = new Date(year, month, day);
+	var box = boxFromCheckin(checkin);
+	var uri = 'http://sanfrancisco.crimespotting.org/crime-data?format=json&count=' + bigNumber + '&box=' +box+ '&start=' + start;
+	var nCrimes;	
+	request.get({uri:uri, json:true}, function (err, resp, js){
+		nCrimes = js.features.length;	
+	})
 }
 
 app.listen(port);

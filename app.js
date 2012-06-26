@@ -153,6 +153,13 @@ app.get('/callback', function(req, res) {
   });
 });
 
+//function to get all checkins
+app.get('/checkins', function(req, res) {
+	getProtectedResource('/checkins', req.session, function(err, checkinsBody) {
+		console.log(checkinsBody);
+	});
+});
+
 app.listen(port);
 
 console.log(sprintf('Listening at %s using API endpoint %s.', hostBaseUrl, apiBaseUrl));

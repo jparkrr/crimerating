@@ -13,6 +13,9 @@ var port = 8043;
 var clientId = process.argv[2] || 'b8251190c2d5116f88f4930062a4ca0c';
 var clientSecret = process.argv[3] || 'f073715ed9def9186b1463befcace1fe';
 
+//every block api key
+var ebkey = 'aQkRJjUKPcdtRfA';
+
 var hostBaseUrl = process.argv[4] || 'http://localhost:' + port;
 var apiBaseUrl = process.argv[5] || 'https://api.singly.com';
 
@@ -166,10 +169,13 @@ app.get('/checkins', function(req, res) {
 		});
 		req.session.checkins = checkins; 
 	});
-	
+	getCrimeRating(req.session.checkins);	
 });
 
 
+function getCrimeRating(checkins, crimes){
+
+}
 
 app.listen(port);
 

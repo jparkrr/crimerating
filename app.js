@@ -152,10 +152,24 @@ app.get('/callback', function(req, res) {
 
 //function to get all checkins
 app.get('/checkins', function(req, res) {
-	getProtectedResource('/checkins', req.session, function(err, checkinsBody) {
-		console.log(checkinsBody);
+	getProtectedResource('/types/contacts', req.session, function(err, checkinsBody) {
+		try {
+        	checkinsBody = JSON.parse(checkinsBody);
+			console.log(checkinsBody);
+    	} catch(parseErr) {
+     		console.log('error');
+			return res.send(parseErr, 500);
+    	}
+		var checkins = [];
+		checkinsBody.forEach(function(datum) {
+			checkins.push(datum.oembed);
+		});
+		req.session.checkins = checkins; 
 	});
+	
 });
+
+
 
 app.listen(port);
 

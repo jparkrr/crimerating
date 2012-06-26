@@ -237,14 +237,15 @@ function populateDatabase() {
 
   var end = new Date();
   end.setMonth(currentDate.getMonth() - 1);
+
+  var stmt = db.prepare("INSERT into crimes VALUES (?)");
   var uri = 'http://sanfrancisco.crimespotting.org/crime-data?format=json&count=' + bigNumber + '&dstart=' + start.toISOString().substr(0,10) + '&dend=' + end.toISOString().substr(0,10);
 	console.log(uri);
     request.get(uri, function (err, resp, js){
-		console.log(js);
-		js.features.forEach( function (feature) {
-			db.r
-		});
-      //db.run("");
+      console.log(js);
+      js.features.forEach( function (feature) {
+        stmt.run(js.features.geometry.coordinates[0]+", "+js.features.geometry.coordinates[1]+ ", "+ js.properties.crime_type);
+      });
     });
 }
 

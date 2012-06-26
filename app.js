@@ -10,8 +10,8 @@ var OAuth2 = require('oauth').OAuth2;
 var port = 8043;
 
 // Your client ID and secret from http://dev.singly.com/apps
-var clientId = process.argv[2] || '';
-var clientSecret = process.argv[3] || '';
+var clientId = process.argv[2] || 'b8251190c2d5116f88f4930062a4ca0c';
+var clientSecret = process.argv[3] || 'f073715ed9def9186b1463befcace1fe';
 
 var hostBaseUrl = process.argv[4] || 'http://localhost:' + port;
 var apiBaseUrl = process.argv[5] || 'https://api.singly.com';

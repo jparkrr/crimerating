@@ -11,8 +11,8 @@ var sqlite3 = require('sqlite3').verbose();
 var bigNumber = 10;
 
 //bounding box consts
-var latConst = 0.000101784;
-var lngConst = 0.000300407;
+var latConst = 5.000101784;
+var lngConst = 5.000300407;
 
 // The port that this express app will listen on
 var port = 8043;
@@ -196,7 +196,6 @@ app.get('/crimescore.json', function(req, res) {
 			checkins.push(datum.oembed);
 		});
     var score = getCrimeScore(checkins);
-	console.log(score);
 	});
 });
 
@@ -213,7 +212,8 @@ function getBB(oembed) {
 
 
 function getCrimeScore(checkins){
-	var crimeScore
+	console.log(checkins);
+	var crimeScore = 0;
 	checkins.forEach(function(checkin){
 		crimeScore = crimeScore + crimesPointsPerCheckin(checkin);
 	});
@@ -229,8 +229,7 @@ function crimesPointsPerCheckin(checkin){
 	var east = checkin.lng + lngConst;
 	var west = checkin.lng -lngConst;
 	var cpoints;
-	db.get("SELECT SUM(weight) as \"crimePoints\" FROM crimes WHERE lat < " + north + "AND lat > " + south +
-		"AND lng < " +east+ "AND lng > " +west, function(err, row){
+	db.get("SELECT SUM(weight) as crimePoints FROM crimes WHERE lng < " +east + " AND lng > " +west + " AND lat < " + north + " AND lat > " + south, function(err, row){
 		cpoints = row.crimePoints;
 	});
 }
@@ -252,7 +251,7 @@ function populateDatabase() {
 	request.get(uri, function (err, resp, js){
 		js = JSON.parse(js);
 		js.features.forEach( function (feature) {
-        	db.run("INSERT into crimes VALUES (?, ?, ?)", feature.geometry.coordinates[0], feature.geometry.coordinates[1], crimeWeights[feature.properties.crime_type]);
+        	db.run("INSERT into crimes VALUES (?, ?, ?)", feature.geometry.coordinates[1], feature.geometry.coordinates[0], crimeWeights[feature.properties.crime_type]);
     	});
 		db.each("SELECT * FROM crimes", function(err, row){
 			console.log(row);

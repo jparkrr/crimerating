@@ -13,12 +13,12 @@ var port = 8043;
 var clientId = process.argv[2] || 'b8251190c2d5116f88f4930062a4ca0c';
 var clientSecret = process.argv[3] || 'f073715ed9def9186b1463befcace1fe';
 
-//every block api key
-var ebkey = 'aQkRJjUKPcdtRfA';
-
 var hostBaseUrl = process.argv[4] || 'http://localhost:' + port;
 var apiBaseUrl = process.argv[5] || 'https://api.singly.com';
 var crimeSpottingUrl = 'http://sanfrancisco.crimespotting.org/crime-data';
+
+var ebkey = 'aQkRJjUKPcdtRfA';
+
 
 // Pick a secret to secure your session storage
 var sessionSecret = '42';
@@ -161,20 +161,28 @@ app.get('/callback', function(req, res) {
 app.get('/crimescore.json', function(req, res) {
 	getProtectedResource('/types/checkins', req.session, function(err, checkinsBody) {
 		try {
-      checkinsBody = JSON.parse(checkinsBody);
-			console.log(checkinsBody);
-    }
-    catch(parseErr) {
-      console.log('error');
+			checkinsBody = JSON.parse(checkinsBody);
+    	}
+    	catch(parseErr) {
 			return res.send(parseErr, 500);
-    }
+    	}
 		var checkins = [];
 		checkinsBody.forEach(function(datum) {
 			checkins.push(datum.oembed);
 		});
 	});
+	var score = getCrimeScore(checkins);
 });
 
+function getCrimeScore(checkins){
+	var numCrimes;
+	checkins.forEach(function(checkin){
+		numCrimes = numCrimes + crimesPerCheckin(checkin);
+	});
+}
+
+function crimesPerCheckin(checkin){
+}
 
 app.listen(port);
 

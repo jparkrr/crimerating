@@ -155,7 +155,8 @@ app.get('/callback', function(req, res) {
 
 //function to get all checkins
 app.get('/checkins', function(req, res) {
-	getProtectedResource('/checkins', req.session, function(err, checkinsBody) {
+  console.log(req.session);
+	getProtectedResource('/types/checkins', req.session, function(err, checkinsBody) {
 		console.log(checkinsBody);
 	});
 });

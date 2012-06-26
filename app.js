@@ -5,6 +5,7 @@ var querystring = require('querystring');
 var request = require('request');
 var sprintf = require('sprintf').sprintf;
 var OAuth2 = require('oauth').OAuth2;
+var sqlite3 = require('sqlite3').verbose();
 
 // The port that this express app will listen on
 var port = 8043;
@@ -174,6 +175,14 @@ app.get('/crimescore.json', function(req, res) {
 		});
 	});
 });
+
+function getBB(oembed) {
+  latConst = 0.000101784;
+  lonConst = 0.000300407;
+  lat = oembed.lat;
+  lon = oembed.lon;
+  return lat-latConst+','+lon+lonConst+","+lat+latConst+","+lon-lonConst;
+}
 
 
 app.listen(port);

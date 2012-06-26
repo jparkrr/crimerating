@@ -5,6 +5,7 @@ var querystring = require('querystring');
 var request = require('request');
 var sprintf = require('sprintf').sprintf;
 var OAuth2 = require('oauth').OAuth2;
+var sqlite3 = require('sqlite3').verbose();
 
 //large number to avoid limit on crimes
 var bigNumber = 100000;
@@ -38,6 +39,7 @@ var crimeWeights = {
  "disturbing_the_peace": 1,
 };
 
+var db = new sqlite3.Database(":memory:");
 
 // Pick a secret to secure your session storage
 var sessionSecret = '42';
@@ -189,9 +191,23 @@ app.get('/crimescore.json', function(req, res) {
 		checkinsBody.forEach(function(datum) {
 			checkins.push(datum.oembed);
 		});
+    var score = getCrimeScore(checkins);
 	});
-	var score = getCrimeScore(checkins);
 });
+
+function getBB(oembed) {
+  latConst = 0.000101784;
+  lonConst = 0.000300407;
+  lat = oembed.lat;
+  lat1 = lat-latConst;
+  lat2 = lat+latConst;
+  lon = parseFloat(oembed.lng);
+  lon1 = lon-lonConst;
+  lon2 = lon+lonConst;
+  console.log(lon);
+  return lat1+','+lon1+","+lat2+","+lon2;
+}
+
 
 function getCrimeScore(checkins){
 	var crimeScore
@@ -202,10 +218,31 @@ function getCrimeScore(checkins){
 }
 
 function crimesPointsPerCheckin(checkin){
+	var box = getBB(checkin);
 	database.run("SELECT SUM(crime) as \"crimePoints\" FROM Coords WHERE lat < " + north + "AND lat > " + south +
 		"AND long < " +east+ "AND long > " +west;
 }
 
+
+function populateDatabase(db) {
+  db.serialize(function() {
+    db.run("CREATE TABLE crimes (lat REAL, lng REAL, weight INTEGER)");
+  });
+  var currentDate = new Date();
+
+  var start = new Date();
+  start.setMonth(currentDate.getMonth() - 4);
+
+  var end = new Date();
+  end.setMonth(currentDate.getMonth() - 1);
+  var uri = 'http://sanfrancisco.crimespotting.org/crime-data?format=json&count=' + bigNumber + '&dstart=' + start + '&dend=' + end;
+    request.get({uri:uri, json:true}, function (err, resp, js){
+      console.log(js);
+      //db.run("");
+    });
+}
+
+populateDatabase();
 
 
 app.listen(port);

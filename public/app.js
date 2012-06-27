@@ -51,8 +51,9 @@ $(function() {
    }
 
    function updateCrimeScore(num) {
-      $('#cs').html(num);
+      $("#cs").html("Your CrimeScore is: "+num);
    }
-
-   getCrimeScore();
+   $("#calc").click(function () {
+      getCrimeScore();
+   });
 });

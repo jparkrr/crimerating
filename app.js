@@ -9,11 +9,11 @@ var sqlite3 = require('sqlite3').verbose();
 var async = require ('async');
 
 //large number to avoid limit on crimes
-var bigNumber = 10;
+var bigNumber = 100;
 
 //bounding box consts
-var latConst = 5.000101784;
-var lngConst = 5.000300407;
+var latConst = 0.000101784;
+var lngConst = 0.000300407;
 
 // The port that this express app will listen on
 var port = 8043;

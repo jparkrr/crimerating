@@ -9,11 +9,11 @@ var sqlite3 = require('sqlite3').verbose();
 var async = require ('async');
 
 //large number to avoid limit on crimes
-var bigNumber = 100;
+var bigNumber = 100000;
 
 //bounding box consts
-var latConst = 0.000101784;
-var lngConst = 0.000300407;
+var latConst = 0.01;
+var lngConst = 0.01;
 
 // The port that this express app will listen on
 var port = 8043;
@@ -43,6 +43,22 @@ var crimeWeights = {
  "NARCOTICS": 2,
  "DISTURBING THE PEACE": 1
 };
+
+var typeCounts = {
+     "Murder" : 0,
+     "Arson" : 0,
+     "Aggravated Assault" : 0,
+     "Vehicle Theft" : 0,
+     "Robbery" : 0,
+     "Burglary" : 0,
+     "Simple Assault" : 0,
+     "Theft" : 0,
+     "Vandalism" : 0,
+      "Prostitution" : 0,
+     "Alcohol" : 0,
+     "Narcotics" : 0,
+     "Disturbing the Peace" : 0 
+ }
 
 var db = new sqlite3.Database(":memory:");
 
@@ -196,8 +212,8 @@ app.get('/crimescore.json', function(req, res) {
 		checkinsBody.forEach(function(datum) {
 			checkins.push(datum.oembed);
 		});
-	    getCrimeScore(checkins, function (score) {
-			res.json( { "crimeScore": score} );
+	    getCrimeScore(checkins, function (score, chs) {
+			res.json( { "crimeScore": score, "checkins": chs} );
 		});
 	});
 });
@@ -230,7 +246,7 @@ function getCrimeScore(checkins, cb){
 		});
 	}, function(err) {
 		console.log("crime score: " + crimeScore);
-		cb(crimeScore/checkins.length);
+		cb(crimeScore/checkins.length, checkins.length);
 	});
 }
 
@@ -243,10 +259,11 @@ function populateDatabase() {
     db.run("CREATE TABLE crimes (lat REAL, lng REAL, weight INTEGER)");
   });
   var currentDate = new Date();
-  var start = new Date();
-  start.setMonth(currentDate.getMonth() - 4);
   var end = new Date();
   end.setMonth(currentDate.getMonth() - 1);
+  var start = new Date();
+  start.setMonth(currentDate.getMonth() - 1);
+	start.setDate(start.getDate()-7);
 
   var uri = 'http://sanfrancisco.crimespotting.org/crime-data?format=json&count=' + bigNumber + '&dstart=' + start.toISOString().substr(0,10) + '&dend=' + end.toISOString().substr(0,10);
 	console.log(uri);    
@@ -255,9 +272,6 @@ function populateDatabase() {
 		js.features.forEach( function (feature) {
         	db.run("INSERT into crimes VALUES (?, ?, ?)", feature.geometry.coordinates[1], feature.geometry.coordinates[0], crimeWeights[feature.properties.crime_type]);
     	});
-		db.each("SELECT * FROM crimes", function(err, row){
-			console.log(row);
-		});
 	});
 }
 

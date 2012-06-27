@@ -43,15 +43,17 @@ $(function() {
    function getCrimeScore() {
       console.log('getting crimescore');
       $.getJSON(crimeScoreUrl, function(js) {
-         updateCrimeScore(js.crimeScore);
+         updateCrimeScore(js.crimeScore, js.checkins);
       })
       .error(function () {
          updateCrimeScore("(server error)");
       });
    }
 
-   function updateCrimeScore(num) {
+   function updateCrimeScore(num,cis) {
       $("#cs").html("Your CrimeScore is: "+num);
+	  $("#ci").html("Number of checkins: "+cis);
+	
    }
    $("#calc").click(function () {
       getCrimeScore();

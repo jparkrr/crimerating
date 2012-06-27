@@ -6,6 +6,7 @@ var request = require('request');
 var sprintf = require('sprintf').sprintf;
 var OAuth2 = require('oauth').OAuth2;
 var sqlite3 = require('sqlite3').verbose();
+var async = require ('async');
 
 //large number to avoid limit on crimes
 var bigNumber = 10;
@@ -195,7 +196,9 @@ app.get('/crimescore.json', function(req, res) {
 		checkinsBody.forEach(function(datum) {
 			checkins.push(datum.oembed);
 		});
-    var score = getCrimeScore(checkins);
+	    getCrimeScore(checkins, function (score) {
+			res.json( { "crimeScore": score} );
+		});
 	});
 });
 
@@ -211,28 +214,27 @@ function getBB(oembed) {
 }
 
 
-function getCrimeScore(checkins){
-	console.log(checkins);
+function getCrimeScore(checkins, cb){
 	var crimeScore = 0;
-	checkins.forEach(function(checkin){
-		crimeScore = crimeScore + crimesPointsPerCheckin(checkin);
+	async.forEachSeries(checkins, function(item, callback) {
+		var north = item.lat + latConst;
+		var south = item.lat - latConst;
+		var east = item.lng + lngConst;
+		var west = item.lng -lngConst;
+		var cpoints;
+		db.get("SELECT SUM(weight) as crimePoints FROM crimes WHERE lng < " +east + " AND lng > " +west + " AND lat < " + north + " AND lat > " + south, function(err, row){
+			temp = row.crimePoints;
+			crimeScore = crimeScore + temp;
+			console.log("another crime!: " + crimeScore + "(PS, temp: " +temp+")");
+			callback();
+		});
+	}, function(err) {
+		console.log("crime score: " + crimeScore);
+		cb(crimeScore/checkins.length);
 	});
-	console.log(crimeScore);
-	console.log(checkins.length);
-	return crimeScore/checkins.length;
 }
 
 
-function crimesPointsPerCheckin(checkin){
-	var north = checkin.lat + latConst;
-	var south = checkin.lat - latConst;
-	var east = checkin.lng + lngConst;
-	var west = checkin.lng -lngConst;
-	var cpoints;
-	db.get("SELECT SUM(weight) as crimePoints FROM crimes WHERE lng < " +east + " AND lng > " +west + " AND lat < " + north + " AND lat > " + south, function(err, row){
-		cpoints = row.crimePoints;
-	});
-}
 
 
 
